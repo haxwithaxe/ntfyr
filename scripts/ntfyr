@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+
+import argparse
+import configparser
+import select
+import sys
+
+from ntfyr import NtfyrError, notify
+
+
+PRIORITIES = ['max', 'urgent', 'high', 'default', 'low', 'min', '1', '2', '3',
+              '4', '5']
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Send a notification with ntfy.')
+    # Headers
+    parser.add_argument('-A', '--actions', default=None,
+                        help='See https://ntfy.sh/docs/publish/')
+    parser.add_argument('-X', '--attach', default=None,
+                        help='See https://ntfy.sh/docs/publish/')
+    parser.add_argument('-C', '--click', default=None,
+                        help='See https://ntfy.sh/docs/publish/')
+    parser.add_argument('-D', '--delay', default=None,
+                        help='See https://ntfy.sh/docs/publish/')
+    parser.add_argument('-E', '--email', default=None,
+                        help='See https://ntfy.sh/docs/publish/')
+    parser.add_argument('-P', '--priority', choices=PRIORITIES,
+                        default='default',
+                        help='See https://ntfy.sh/docs/publish/')
+    parser.add_argument('-G', '--tags', nargs='+', default=[],
+                        help='See https://ntfy.sh/docs/publish/')
+    parser.add_argument('-T', '--title', default=None,
+                        help='See https://ntfy.sh/docs/publish/')
+    # Data
+    parser.add_argument('-m', '--message', default='-',
+                        help='The body of the message to send. The default'
+                             ' (or if "-"is given) is to read from stdin.')
+    # Config
+    parser.add_argument('-t', '--topic', required=True,
+                        help='The topic to send the notification to. Required')
+    parser.add_argument('-s', '--server', default=None,
+                        help='The server to send the notification to.')
+    parser.add_argument('-u', '--user', default=None,
+                        help='The user to authenticate to the server with.')
+    parser.add_argument('-p', '--password', default=None,
+                        help='The password to authenticate to the server with.')
+    parser.add_argument(
+        '-c',
+        '--config',
+        default='/etc/ntfyr/config.ini',
+        help='The configuration file with default values.'
+             ' The values specified as arguments override the'
+             ' values in this file.'
+    )
+    parser.add_argument('--debug', action='store_true', default=False,
+                        help='Show extra information in the error messages.')
+    args = parser.parse_args()
+    try:
+        confparser = configparser.ConfigParser(defaults={})
+        confparser.read(args.config)
+        config = confparser['ntfyr']
+    except KeyError:
+        config = {}
+    if args.message == '-':
+        if select.select([sys.stdin], [], [], 0)[0]:
+            message = sys.stdin.read()
+        else:
+            message = ''
+    else:
+        message = args.message
+    try:
+        notify(args, config, message)
+    except NtfyrError as err:
+        print(f'Error sending to {err.server}/{err.topic}: {err.message}',
+              file=sys.stderr)
+        if args.debug:
+            print('Sent headers:', err.headers, file=sys.stderr)
+            print(f'Sent message:\n{message}', file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as err:
+        print(err, file=sys.stderr)
+        sys.exit(2)

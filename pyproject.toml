@@ -1,0 +1,23 @@
+[project]
+name="ntfyr"
+version = "0.1"
+authors = [
+  { name="haxwithaxe", email="spam@haxwithaxe.net" },
+]
+description = "A simple client for ntfy.sh."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.7"
+dependencies = ["requests>=2"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities"
+]
+keywords = ["alerts", "alerting", "notification", "notify", "ntfy.sh"]
+
+[project.urls]
+"Homepage" = "https://github.com/haxwithaxe/ntfyr"
+"Bug Tracker" = "https://github.com/haxwithaxe/ntfyr/issues"
