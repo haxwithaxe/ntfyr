@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """A script to send notifications to https://ntfy.sh
 
 This script is a part of the python package ntfyr which can be found at
@@ -10,7 +9,9 @@ import argparse
 import select
 import sys
 
-import ntfyr
+from .config import Config
+from .errors import NtfyrError
+from .ntfyr import notify
 
 
 DEFAULT_TIMESTAMP = '%Y-%m-%d %H:%M:%S %Z'
@@ -72,9 +73,9 @@ def main(): # pylint: disable=missing-function-docstring
                         help='Show extra information in the error messages.')
     args = parser.parse_args()
     if args.config:
-        config = ntfyr.config.Config(args, args.config, '/etc/ntfyr/config.ini')
+        config = Config(args, args.config, '/etc/ntfyr/config.ini')
     else:
-        config = ntfyr.config.Config(args, '/etc/ntfyr/config.ini')
+        config = Config(args, '/etc/ntfyr/config.ini')
     if args.message == '-':
         if select.select([sys.stdin], [], [], 0)[0]:
             message = sys.stdin.read()
@@ -83,8 +84,8 @@ def main(): # pylint: disable=missing-function-docstring
     else:
         message = args.message
     try:
-        ntfyr.notify(config, message)
-    except ntfyr.NtfyrError as err:
+        notify(config, message)
+    except NtfyrError as err:
         print(f'Error sending to {err.server}/{err.topic}: {err.message}',
               file=sys.stderr)
         if args.debug:
