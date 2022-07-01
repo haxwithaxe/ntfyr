@@ -7,11 +7,10 @@ https://github.com/haxwithaxe/ntfyr and https://pypi.org/project/ntfyr/
 
 
 import argparse
-import configparser
 import select
 import sys
 
-from ntfyr import NtfyrError, notify
+import ntfyr
 
 
 DEFAULT_TIMESTAMP = '%Y-%m-%d %H:%M:%S %Z'
@@ -64,7 +63,7 @@ def main(): # pylint: disable=missing-function-docstring
     parser.add_argument(
         '-c',
         '--config',
-        default='/etc/ntfyr/config.ini',
+        default=None,
         help='The configuration file with default values.'
              ' The values specified as arguments override the'
              ' values in this file.'
@@ -72,12 +71,10 @@ def main(): # pylint: disable=missing-function-docstring
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Show extra information in the error messages.')
     args = parser.parse_args()
-    try:
-        confparser = configparser.ConfigParser(defaults={})
-        confparser.read(args.config)
-        config = confparser['ntfyr']
-    except KeyError:
-        config = {}
+    if args.config:
+        config = ntfyr.config.Config(args, args.config, '/etc/ntfyr/config.ini')
+    else:
+        config = ntfyr.config.Config(args, '/etc/ntfyr/config.ini')
     if args.message == '-':
         if select.select([sys.stdin], [], [], 0)[0]:
             message = sys.stdin.read()
@@ -86,8 +83,8 @@ def main(): # pylint: disable=missing-function-docstring
     else:
         message = args.message
     try:
-        notify(args, config, message)
-    except NtfyrError as err:
+        ntfyr.notify(config, message)
+    except ntfyr.NtfyrError as err:
         print(f'Error sending to {err.server}/{err.topic}: {err.message}',
               file=sys.stderr)
         if args.debug:
