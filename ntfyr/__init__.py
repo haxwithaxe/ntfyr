@@ -94,7 +94,8 @@ def notify(args, config, message):
             message = _get_timestamp(message_format).format(message=message)
         else:
             message = f'{_get_timestamp(timestamp)} {message}'
-    res = requests.post(url=url, headers=headers, data=message, auth=credentials)
+    res = requests.post(url=url, headers=headers, data=message.encode('utf-8'),
+                        auth=credentials)
     if not res.ok:
         if res.json():
             raise NtfyrError('{error} {link}'.format(**res.json()), server,
