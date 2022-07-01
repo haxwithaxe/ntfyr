@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""A script to send notifications to https://ntfy.sh
+
+This script is a part of the python package ntfyr which can be found at
+https://github.com/haxwithaxe/ntfyr and https://pypi.org/project/ntfyr/
+"""
+
 
 import argparse
 import configparser
@@ -8,11 +14,12 @@ import sys
 from ntfyr import NtfyrError, notify
 
 
+DEFAULT_TIMESTAMP = '%Y-%m-%d %H:%M:%S %Z'
 PRIORITIES = ['max', 'urgent', 'high', 'default', 'low', 'min', '1', '2', '3',
               '4', '5']
 
 
-def main():
+def main(): # pylint: disable=missing-function-docstring
     parser = argparse.ArgumentParser(description='Send a notification with ntfy.')
     # Headers
     parser.add_argument('-A', '--actions', default=None,
@@ -35,7 +42,16 @@ def main():
     # Data
     parser.add_argument('-m', '--message', default='-',
                         help='The body of the message to send. The default'
-                             ' (or if "-"is given) is to read from stdin.')
+                             ' (or if "-" is given) is to read from stdin.')
+    parser.add_argument(
+        '--timestamp',
+        nargs='?',
+        const=DEFAULT_TIMESTAMP,
+        default=None,
+        help='A time format string to prefix the message. See '
+             'https://docs.python.org/3/library/time.html#time.strftime for '
+             'formatting options.'
+    )
     # Config
     parser.add_argument('-t', '--topic', required=True,
                         help='The topic to send the notification to. Required')
@@ -83,6 +99,6 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except Exception as err:
+    except Exception as err: # pylint: disable=broad-except
         print(err, file=sys.stderr)
         sys.exit(2)
