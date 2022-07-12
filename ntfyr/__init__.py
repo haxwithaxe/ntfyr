@@ -3,5 +3,5 @@
 This is just the backend of the ntfyr script.
 """
 
-from .ntfyr import notify
+from .ntfyr import Ntfyr
 from .errors import NtfyrConfigException, NtfyrError, NtfyrException

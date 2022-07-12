@@ -6,12 +6,14 @@ https://github.com/haxwithaxe/ntfyr and https://pypi.org/project/ntfyr/
 
 
 import argparse
+import logging
 import select
 import sys
 
 from .config import Config
 from .errors import NtfyrError
-from .ntfyr import notify
+from .ntfyr import Ntfyr
+from ._common import log
 
 
 DEFAULT_TIMESTAMP = '%Y-%m-%d %H:%M:%S %Z'
@@ -72,6 +74,8 @@ def main(): # pylint: disable=missing-function-docstring
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Show extra information in the error messages.')
     args = parser.parse_args()
+    if args.debug:
+        log.setLevel(logging.DEBUG)
     if args.config:
         config = Config(args, args.config, '/etc/ntfyr/config.ini')
     else:
@@ -80,11 +84,13 @@ def main(): # pylint: disable=missing-function-docstring
         if select.select([sys.stdin], [], [], 0)[0]:
             message = sys.stdin.read()
         else:
+            log.warning('--message is empty and there is no stdin. Sending an '
+                        'empty message.')
             message = ''
     else:
         message = args.message
     try:
-        notify(config, message)
+        Ntfyr(config).notify(message)
     except NtfyrError as err:
         print(f'Error sending to {err.server}/{err.topic}: {err.message}',
               file=sys.stderr)
