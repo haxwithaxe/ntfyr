@@ -36,7 +36,7 @@ class Config:
             self.add_source(source)
 
     def add_source(self, source):
-        if hasattr(source, 'get'):
+        if hasattr(source, 'get') and hasattr(source, 'keys'):
             self._souces.append(source)
         elif isinstance(source, argparse.Namespace):
             self._souces.append(NamespaceAdapter(source))
@@ -47,7 +47,7 @@ class Config:
             confparser = configparser.ConfigParser(defaults={})
             confparser.read(source)
             try:
-                self._souces.append(confparser['ntfyr'])
+                self._souces.append(dict(confparser['ntfyr']))
             except KeyError:
                 raise NtfyrConfigException(f'Invalid config source: {source}')
         else:
@@ -58,3 +58,17 @@ class Config:
             if source.get(key) is not None:
                 return source.get(key)
         return default
+
+    # Make Config unpackable
+    def keys(self):
+        return set(k for s in self._souces for k in s.keys())
+
+    def __getitem__(self, key):
+        return self.get(key)
+
+    # Make Config work with `dict`
+    def __iter__(self):
+        items = {}
+        for source in self._souces:
+            items.update(source)
+        return iter(items)

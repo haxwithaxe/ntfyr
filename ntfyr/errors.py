@@ -12,6 +12,21 @@ class NtfyrConfigException(NtfyrException):
     pass
 
 
+class NtfyrMissingValueError(NtfyrException):
+
+    def __init__(self, value):
+        super().__init__('Missing `{value}` value.')
+        self.value = value
+
+
+class NtfyrInvalidValueError(NtfyrException):
+
+    def __init__(self, key, value):
+        super().__init__('Invalid value "{value}" for `{key}`.')
+        self.key = key
+        self.value = value
+
+
 class NtfyrError(NtfyrException):
     """ntfyr flow control error
 
