@@ -90,7 +90,7 @@ def main(): # pylint: disable=missing-function-docstring
     else:
         message = args.message
     try:
-        Ntfyr(config).notify(message)
+        Ntfyr(**config).notify(message)
     except NtfyrError as err:
         print(f'Error sending to {err.server}/{err.topic}: {err.message}',
               file=sys.stderr)
