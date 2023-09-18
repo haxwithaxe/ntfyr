@@ -6,9 +6,11 @@ https://github.com/haxwithaxe/ntfyr and https://pypi.org/project/ntfyr/
 
 
 import argparse
+import logging
 import select
 import sys
 
+from ._common import log
 from .config import Config
 from .errors import NtfyrError
 from .ntfyr import notify
@@ -17,14 +19,10 @@ DEFAULT_TIMESTAMP = '%Y-%m-%d %H:%M:%S %Z'
 PRIORITIES = ['max', 'urgent', 'high', 'default', 'low', 'min', '1', '2', '3',
               '4', '5']
 
+
 # Not using logging since this may be pre-config
 def _error(fmt, *msg, **kwargs):
     print('ERROR:', fmt.format(**kwargs), *msg, file=sys.stderr)
-
-
-# Not using logging since this may be pre-config
-def _debug(fmt, *msg, **kwargs):
-    print('DEBUG:', fmt.format(**kwargs), *msg)
 
 
 def main():  # noqa: D103
@@ -82,7 +80,17 @@ def main():  # noqa: D103
     )
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Show extra information in the error messages.')
+    parser.add_argument(
+        '--log-level',
+        default='ERROR',
+        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+        help='Set the log level.'
+    )
     args = parser.parse_args()
+    if args.debug:
+        log.setLevel(logging.DEBUG)
+    elif args.log_level:
+        log.setLevel(getattr(logging, args.log_level.upper()))
     if args.config:
         config = Config(args, args.config, '/etc/ntfyr/config.ini')
     else:
@@ -100,9 +108,8 @@ def main():  # noqa: D103
         _error('Error sending to {err.server}/{err.topic}: '
                '{err.__class__.__name__}: {err.message}',
                err=err)
-        if args.debug:
-            _debug('Sent headers:', err.headers)
-            _debug('Sent message:\n', message)
+        log.debug('Sent headers: %s', err.headers)
+        log.debug('Sent message:\n%s', message)
         sys.exit(1)
 
 

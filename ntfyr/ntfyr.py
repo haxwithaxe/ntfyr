@@ -5,6 +5,7 @@ from datetime import datetime as dt
 import requests
 import tzlocal
 
+from ._common import log
 from .errors import NtfyrError
 
 
@@ -73,8 +74,12 @@ def notify(config, message):
             message = _get_timestamp(message_format).format(message=message)
         else:
             message = f'{_get_timestamp(timestamp)} {message}'
+
+    log.debug('Sending request: method=POST, url=%s, headers=%s, auth.user=%s, '
+              'data=%s', url, headers, user, message)
     res = requests.post(url=url, headers=headers, data=message.encode('utf-8'),
                         auth=credentials)
+    log.debug('Got response: %s\n%s\n', res, res.json())
     if not res.ok:
         if res.json():
             raise NtfyrError('{error} {link}'.format(**res.json()), server,

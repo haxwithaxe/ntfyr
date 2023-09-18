@@ -38,8 +38,10 @@ class Config:
     def add_source(self, source):
         if hasattr(source, 'get'):
             self._souces.append(source)
+            log.debug('Added config source: %s', source.__class__.__name__)
         elif isinstance(source, argparse.Namespace):
             self._souces.append(NamespaceAdapter(source))
+            log.debug('Added config source: args')
         elif isinstance(source, str):
             if not os.path.exists(source):
                 log.warn('The config source "%s" does not exist.', source)
@@ -50,6 +52,7 @@ class Config:
                 self._souces.append(confparser['ntfyr'])
             except KeyError:
                 raise NtfyrConfigException(f'Invalid config source: {source}')
+            log.debug('Added config source: %s', source)
         else:
             raise NtfyrConfigException(f'Unknown source type {source}')
 
