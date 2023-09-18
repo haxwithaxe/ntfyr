@@ -1,7 +1,4 @@
-"""A tool to send notifications to https://ntfy.sh
-
-This is just the backend of the ntfyr script.
-"""
+"""The main `ntfyr` functionality."""
 
 
 from datetime import datetime as dt
@@ -40,7 +37,7 @@ def _get_headers(config):
 
 
 def _get_timestamp(ts_format):
-    """Returns the local time formatted with `ts_format`.
+    """Return the local time formatted with `ts_format`.
 
     See https://docs.python.org/3/library/time.html#time.strftime for string
     formatting options.
@@ -54,7 +51,6 @@ def notify(config, message):
     """Send a notification.
 
     Arguments:
-        args (argparse.Namespace): The arguments passed to the script.
         config (dict): Parsed config from the config file.
         message (str): The body of the message to be sent.
     """
