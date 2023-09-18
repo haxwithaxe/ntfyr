@@ -1,4 +1,4 @@
-"""A script to send notifications to https://ntfy.sh
+"""A script to send notifications to [ntfy.sh](https://ntfy.sh).
 
 This script is a part of the python package ntfyr which can be found at
 https://github.com/haxwithaxe/ntfyr and https://pypi.org/project/ntfyr/
@@ -13,14 +13,24 @@ from .config import Config
 from .errors import NtfyrError
 from .ntfyr import notify
 
-
 DEFAULT_TIMESTAMP = '%Y-%m-%d %H:%M:%S %Z'
 PRIORITIES = ['max', 'urgent', 'high', 'default', 'low', 'min', '1', '2', '3',
               '4', '5']
 
+# Not using logging since this may be pre-config
+def _error(fmt, *msg, **kwargs):
+    print('ERROR:', fmt.format(**kwargs), *msg, file=sys.stderr)
 
-def main(): # pylint: disable=missing-function-docstring
-    parser = argparse.ArgumentParser(description='Send a notification with ntfy.')
+
+# Not using logging since this may be pre-config
+def _debug(fmt, *msg, **kwargs):
+    print('DEBUG:', fmt.format(**kwargs), *msg)
+
+
+def main():  # noqa: D103
+    parser = argparse.ArgumentParser(
+        description='Send a notification with ntfy.'
+    )
     # Headers
     parser.add_argument('-A', '--actions', default=None,
                         help='See https://ntfy.sh/docs/publish/')
@@ -60,7 +70,8 @@ def main(): # pylint: disable=missing-function-docstring
     parser.add_argument('-u', '--user', default=None,
                         help='The user to authenticate to the server with.')
     parser.add_argument('-p', '--password', default=None,
-                        help='The password to authenticate to the server with.')
+                        help='The password to authenticate to the server with.'
+                        )
     parser.add_argument(
         '-c',
         '--config',
@@ -86,17 +97,18 @@ def main(): # pylint: disable=missing-function-docstring
     try:
         notify(config, message)
     except NtfyrError as err:
-        print(f'Error sending to {err.server}/{err.topic}: {err.message}',
-              file=sys.stderr)
+        _error('Error sending to {err.server}/{err.topic}: '
+               '{err.__class__.__name__}: {err.message}',
+               err=err)
         if args.debug:
-            print('Sent headers:', err.headers, file=sys.stderr)
-            print(f'Sent message:\n{message}', file=sys.stderr)
+            _debug('Sent headers:', err.headers)
+            _debug('Sent message:\n', message)
         sys.exit(1)
 
 
 if __name__ == '__main__':
     try:
         main()
-    except Exception as err: # pylint: disable=broad-except
-        print(err, file=sys.stderr)
+    except Exception as err:
+        _error(err.__class__.__name__, err)
         sys.exit(2)
