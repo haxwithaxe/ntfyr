@@ -91,10 +91,12 @@ def main():  # noqa: D103
         log.setLevel(logging.DEBUG)
     elif args.log_level:
         log.setLevel(getattr(logging, args.log_level.upper()))
+    config = Config()
     if args.config:
-        config = Config(args, args.config, '/etc/ntfyr/config.ini')
+        config.update(args.config)
     else:
-        config = Config(args, '/etc/ntfyr/config.ini')
+        config.search()
+    config.update(args)
     if args.message == '-':
         if select.select([sys.stdin], [], [], 0)[0]:
             message = sys.stdin.read()
