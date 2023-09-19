@@ -106,12 +106,14 @@ class Config:
     user: str = None
     password: str = None
 
-    def _typed_set(self, attr, value, required_type, choices=None):
-        if not isinstance(value, required_type):
-            raise NtfyrConfigException(f'Invalid value for `{attr}`: {value}')
-        if choices and value not in choices:
-            raise NtfyrConfigException(f'Invalid value for `{attr}`: {value}')
-        setattr(self, attr, value)
+    def get(self, key, default=None):
+        if key in self.__dict__:
+            return self.__dict__[key]
+        return default
+
+    def search(self):
+        for source in _config_paths():
+            self.update(source)
 
     def update(self, source):
         source = _convert_source(source)
@@ -139,14 +141,12 @@ class Config:
             self._typed_set(key, source.get(key), required_type)
         return self
 
-    def get(self, key, default=None):
-        if key in self.__dict__:
-            return self.__dict__[key]
-        return default
-
-    def search(self):
-        for source in _config_paths():
-            self.update(source)
+    def _typed_set(self, attr, value, required_type, choices=None):
+        if not isinstance(value, required_type):
+            raise NtfyrConfigException(f'Invalid value for `{attr}`: {value}')
+        if choices and value not in choices:
+            raise NtfyrConfigException(f'Invalid value for `{attr}`: {value}')
+        setattr(self, attr, value)
 
     @classmethod
     def from_args(cls, args):
