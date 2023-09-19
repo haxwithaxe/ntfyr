@@ -83,13 +83,7 @@ def _configure(args):
     if args.log_level:
         log.setLevel(getattr(logging, args.log_level.upper()))
     # Assemble the config
-    config = Config()
-    if args.config:
-        config.update(args.config)
-    else:
-        config.search()
-    config.update(args)
-    return config
+    return Config.from_args(args)
 
 
 def _get_message(args):

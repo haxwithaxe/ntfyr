@@ -137,6 +137,7 @@ class Config:
             if key == 'timestamp' and source.get('timestamp'):
                 self.include_timestamp = True
             self._typed_set(key, source.get(key), required_type)
+        return self
 
     def get(self, key, default=None):
         if key in self.__dict__:
@@ -146,3 +147,13 @@ class Config:
     def search(self):
         for source in _config_paths():
             self.update(source)
+
+    @classmethod
+    def from_args(cls, args):
+        config = cls()
+        if args.config:
+            config.update(args.config)
+        else:
+            config.search()
+        config.update(args)
+        return config
