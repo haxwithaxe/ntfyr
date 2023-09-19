@@ -11,21 +11,12 @@ import select
 import sys
 
 from ._common import log
-from .config import Config
+from .config import Config, DEFAULT_TIMESTAMP, PRIORITIES
 from .errors import NtfyrError
 from .ntfyr import notify
 
-DEFAULT_TIMESTAMP = '%Y-%m-%d %H:%M:%S %Z'
-PRIORITIES = ['max', 'urgent', 'high', 'default', 'low', 'min', '1', '2', '3',
-              '4', '5']
 
-
-# Not using logging since this may be pre-config
-def _error(fmt, *msg, **kwargs):
-    print('ERROR:', fmt.format(**kwargs), *msg, file=sys.stderr)
-
-
-def main():  # noqa: D103
+def _parse_args():
     parser = argparse.ArgumentParser(
         description='Send a notification with ntfy.'
     )
@@ -78,38 +69,49 @@ def main():  # noqa: D103
              ' The values specified as arguments override the'
              ' values in this file.'
     )
-    parser.add_argument('--debug', action='store_true', default=False,
-                        help='Show extra information in the error messages.')
     parser.add_argument(
         '--log-level',
         default='ERROR',
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         help='Set the log level.'
     )
-    args = parser.parse_args()
-    if args.debug:
-        log.setLevel(logging.DEBUG)
-    elif args.log_level:
+    return parser.parse_args()
+
+
+def _configure(args):
+    # Setup logging
+    if args.log_level:
         log.setLevel(getattr(logging, args.log_level.upper()))
+    # Assemble the config
     config = Config()
     if args.config:
         config.update(args.config)
     else:
         config.search()
     config.update(args)
+    return config
+
+
+def _get_message(args):
     if args.message == '-':
         if select.select([sys.stdin], [], [], 0)[0]:
-            message = sys.stdin.read()
+            return sys.stdin.read()
         else:
-            message = ''
+            return ''
     else:
-        message = args.message
+        return args.message
+
+
+def main():  # noqa: D103
+    args = _parse_args()
+    config = _configure(args)
+    message = _get_message(args)
     try:
         notify(config, message)
     except NtfyrError as err:
-        _error('Error sending to {err.server}/{err.topic}: '
-               '{err.__class__.__name__}: {err.message}',
-               err=err)
+        log.error('Error sending to {err.server}/{err.topic}: '
+                  '{err.__class__.__name__}: {err.message}',
+                  err=err)
         log.debug('Sent headers: %s', err.headers)
         log.debug('Sent message:\n%s', message)
         sys.exit(1)
@@ -119,5 +121,5 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as err:
-        _error(err.__class__.__name__, err)
+        print('ERROR:ntfyr:', err.__class__.__name__, err, file=sys.stderr)
         sys.exit(2)
