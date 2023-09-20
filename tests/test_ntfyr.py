@@ -86,7 +86,6 @@ def test_get_timestamp(mocker):
     # Chose a day rather than a time so that the likelyhood of a race condition
     #   between the two formatting operations is low.
     date_format = '%Y-%m-%d'
-    # mocker.patch.dict(os.environ, {'TZ': 'Etc/UTC'})
     timestamp = _get_timestamp(date_format)
     expected_timestamp = dt.now().strftime(date_format)
     assert timestamp == expected_timestamp
