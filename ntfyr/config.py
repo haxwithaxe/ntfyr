@@ -43,7 +43,7 @@ def _convert_source(source):
         source = pathlib.Path(source)
         if not source.exists():
             log.warning('The config source "%s" does not exist.', source)
-            return
+            return {}
         try:
             config_text = source.read_text()
         except OSError as err:
@@ -83,7 +83,7 @@ class NamespaceAdapter:
                 getattr(self._namespace, key) is not None)
 
     def __getitem__(self, key):
-        if hasattr(self._namespace, key):
+        if key in self:
             return getattr(self._namespace, key)
         raise KeyError(key)
 
@@ -125,8 +125,8 @@ class Config:
                 self._typed_set(key, value, required_type, PRIORITIES)
                 continue
             if key == 'tags':
-                if value and isinstance(value, str):
-                    value = [value]
+                if value and not isinstance(value, (list, tuple)):
+                    value = [str(value)]
                 tags = []
                 for tag in value:
                     if not tag and not isinstance(tag, int):

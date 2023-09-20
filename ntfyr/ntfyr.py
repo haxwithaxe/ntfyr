@@ -78,7 +78,9 @@ def notify(config, message):
     log.debug('Got response: %s\n%s\n', res, res.json())
     if not res.ok:
         if res.json():
-            raise NtfyrError('{error} {link}'.format(**res.json()), server,
-                             config.get('topic'), headers, message)
-        raise NtfyrError(f'{res.status_code} {res.content.decode()}', server,
-                         config.get('topic'), headers, message)
+            raise NtfyrError('{error} {link}'.format(**res.json()),
+                             server=server, topic=config.get('topic'),
+                             message=message, headers=headers)
+        raise NtfyrError(f'{res.status_code} {res.content.decode()}',
+                         server=server, topic=config.get('topic'),
+                         message=message, headers=headers)

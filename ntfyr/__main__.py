@@ -16,7 +16,7 @@ from .errors import NtfyrError
 from .ntfyr import notify
 
 
-def _parse_args():
+def _parse_args(args):
     parser = argparse.ArgumentParser(
         description='Send a notification with ntfy.'
     )
@@ -75,7 +75,7 @@ def _parse_args():
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         help='Set the log level.'
     )
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def _configure(args):
@@ -97,7 +97,7 @@ def _get_message(args):
 
 
 def main():  # noqa: D103
-    args = _parse_args()
+    args = _parse_args(sys.argv)
     config = _configure(args)
     message = _get_message(args)
     try:
