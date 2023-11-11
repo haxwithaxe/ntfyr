@@ -12,7 +12,7 @@ from ntfyr.ntfyr import _get_headers, _get_timestamp, notify
 
 def _too_close_to_midnight(seconds_till=2):
     now = dt.now()
-    if now.hour == 23 and now.minute < (60-seconds_till):
+    if now.hour == 23 and now.minute == 59 and now.second < (59-seconds_till):
         return True
     return False
 
@@ -90,10 +90,11 @@ def test_get_timestamp(mocker):
     expected_timestamp = dt.now().strftime(date_format)
     assert timestamp == expected_timestamp
 
-
+@pytest.mark.skipif(
+    _too_close_to_midnight(),
+    reason='Too close to midnight. Timestamp might be wrong erroneously.',
+)
 def test_notify_kitchen_sink(mocker):
-    assert not _too_close_to_midnight(), \
-        'Too close to midnight. Timestamp might be wrong erroneously.'
     message = 'test message'  # Must not contain time format variables
     context, mock_post = _mock_post_factory()
     mocker.patch('ntfyr.ntfyr.requests.post', mock_post)
