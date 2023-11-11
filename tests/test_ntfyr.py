@@ -12,7 +12,7 @@ from ntfyr.ntfyr import _get_headers, _get_timestamp, notify
 
 def _too_close_to_midnight(seconds_till=2):
     now = dt.now()
-    if now.hour == 23 and now.minute == 59 and now.second < (59-seconds_till):
+    if now.hour == 23 and now.minute == 59 and now.second < (59 - seconds_till):
         return True
     return False
 
@@ -25,7 +25,7 @@ def _mock_post_factory():
         return namedtuple(
             'mock_response',
             ['ok', 'json'],
-            defaults=[True, lambda: {}]
+            defaults=[True, lambda: {}],
         )()
 
     return context, _mock_post
@@ -47,8 +47,8 @@ def _mock_post_error_factory(with_json=True):
                 False,
                 lambda: json if with_json else None,
                 status_code,
-                content
-            ]
+                content,
+            ],
         )()
 
     return context, _mock_post
@@ -63,7 +63,7 @@ def test_get_headers_all():
         email='email value',
         priority='default',
         tags=['tag0', 'tag1', 'tag2'],
-        title='title value'
+        title='title value',
     )
     headers = _get_headers(config)
     assert headers['Actions'] == config.actions
@@ -89,6 +89,7 @@ def test_get_timestamp(mocker):
     timestamp = _get_timestamp(date_format)
     expected_timestamp = dt.now().strftime(date_format)
     assert timestamp == expected_timestamp
+
 
 @pytest.mark.skipif(
     _too_close_to_midnight(),
@@ -130,7 +131,10 @@ def test_notify_kitchen_sink(mocker):
     assert context['auth'] == (config.user, config.password)
     assert context['url'] == f'{config.server}/{config.topic}'
     # Message/timestamp
-    assert context['data'] == dt.now().strftime(f'timestamp value: %Y-%m {message}').encode()
+    assert (
+        context['data']
+        == dt.now().strftime(f'timestamp value: %Y-%m {message}').encode()
+    )
 
 
 def test_notify_error_with_json(mocker):
@@ -144,12 +148,13 @@ def test_notify_error_with_json(mocker):
         # Config
         include_timestamp=False,
         timestamp=None,
-        server='server value'
+        server='server value',
     )
     with pytest.raises(NtfyrError) as err:
         notify(config, message)
-    assert err.value.message == '{error} {link}'.format(error='error text',
-                                                  link='error link')
+    assert err.value.message == '{error} {link}'.format(
+        error='error text', link='error link'
+    )
     assert err.value.headers == {'Priority': config.priority}
     assert err.value.topic == config.topic
     assert err.value.server == config.server
@@ -174,7 +179,7 @@ def test_notify_error_without_json(mocker):
         # Config
         include_timestamp=False,
         timestamp=None,
-        server='server value'
+        server='server value',
     )
     with pytest.raises(NtfyrError) as err:
         notify(config, message)

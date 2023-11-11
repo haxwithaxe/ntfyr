@@ -7,6 +7,7 @@ class NtfyrException(Exception):
 
 class NtfyrConfigException(NtfyrException):
     """Indicates an error in a `ntfyr` config file."""
+
     pass
 
 
@@ -25,8 +26,14 @@ class NtfyrError(NtfyrException):
             in the config.
     """
 
-    def __init__(self, error, server=None, topic=None, message=None,
-                 headers=None):  # noqa: D107
+    def __init__(
+        self,
+        error,
+        server=None,
+        topic=None,
+        message=None,
+        headers=None,
+    ):  # noqa: D107
         super().__init__(error)
         self.message = error
         self.server = server

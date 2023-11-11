@@ -1,4 +1,3 @@
-
 import argparse
 import os
 import pathlib
@@ -6,17 +5,25 @@ import pathlib
 import pytest
 
 from ntfyr.__main__ import _parse_args
-from ntfyr.config import _config_paths, _convert_source, NamespaceAdapter, Config
+from ntfyr.config import (
+    Config,
+    NamespaceAdapter,
+    _config_paths,
+    _convert_source,
+)
 from ntfyr.errors import NtfyrConfigException
 
 
 def test_config_paths_env_list(mocker):
-    expected_paths = [pathlib.Path('path0'), pathlib.Path('path1'),
-                      pathlib.Path('path2')]
+    expected_paths = [
+        pathlib.Path('path0'),
+        pathlib.Path('path1'),
+        pathlib.Path('path2'),
+    ]
     mocker.patch.dict(
         os.environ,
         {'NTFYR_CONFIGS': 'path0:path1:path2'},
-        clear=True
+        clear=True,
     )
     actual_paths = _config_paths()
     assert actual_paths == expected_paths
@@ -27,10 +34,13 @@ def test_config_paths_env_xdg_home_config(mocker):
     expected_paths = [
         pathlib.Path('/etc/ntfyr/config.ini'),
         pathlib.Path('/usr/local/etc/ntfyr/config.ini'),
-        pathlib.Path(home_dir)
+        pathlib.Path(home_dir),
     ]
-    mocker.patch.dict(os.environ, {'XDG_CONFIG_HOME': home_dir},
-                      clear=True)
+    mocker.patch.dict(
+        os.environ,
+        {'XDG_CONFIG_HOME': home_dir},
+        clear=True,
+    )
     actual_paths = _config_paths()
     assert actual_paths == expected_paths
 
@@ -40,8 +50,12 @@ def test_config_paths_fallback(mocker):
     expected_paths = [
         pathlib.Path('/etc/ntfyr/config.ini'),
         pathlib.Path('/usr/local/etc/ntfyr/config.ini'),
-        pathlib.Path(os.path.join(home_dir,
-                                  '.config/ntfyr/config.ini'))
+        pathlib.Path(
+            os.path.join(
+                home_dir,
+                '.config/ntfyr/config.ini',
+            )
+        ),
     ]
     mocker.patch.dict(os.environ, {'HOME': home_dir}, clear=True)
     actual_paths = _config_paths()
@@ -50,7 +64,6 @@ def test_config_paths_fallback(mocker):
 
 def test_convert_source_dict_interface():
     class DictLike:
-
         get = None
         __contains__ = None
 
@@ -126,21 +139,23 @@ def test_namespace_adapter():
 
 def test_config_update_all():
     config = Config()
-    config.update({
-        'topic': '1',
-        'actions': '2',
-        'attach': '3',
-        'click': '4',
-        'delay': '5',
-        'email': '6',
-        'priority': 'low',
-        'tags': ['7'],
-        'title': '8',
-        'timestamp': '9',
-        'server': '10',
-        'user': '11',
-        'password': '12'
-    })
+    config.update(
+        {
+            'topic': '1',
+            'actions': '2',
+            'attach': '3',
+            'click': '4',
+            'delay': '5',
+            'email': '6',
+            'priority': 'low',
+            'tags': ['7'],
+            'title': '8',
+            'timestamp': '9',
+            'server': '10',
+            'user': '11',
+            'password': '12',
+        }
+    )
 
     assert config.topic == '1'
     assert config.actions == '2'
@@ -162,6 +177,7 @@ def test_config_from_args(mocker, tmp_path):
     config_ini = tmp_path.joinpath('config.ini')
     config_ini.write_text('[ntfyr]\ntitle = test')
     args = [
+        # fmt: off
         '--actions', 'actions value',
         '--attach', 'attach value',
         '--click', 'click value',
@@ -178,11 +194,13 @@ def test_config_from_args(mocker, tmp_path):
         '--password', 'password value',
         '--config', 'config value',
         '--log-level', 'DEBUG'
+        # fmt: on
     ]
     namespace = _parse_args(args)
-    assert isinstance(namespace, argparse.Namespace), \
-        ('The output from _parse args was not a `argparse.Namespace`. This '
-         'invalidates this test')
+    assert isinstance(namespace, argparse.Namespace), (
+        'The output from _parse args was not a `argparse.Namespace`. This '
+        'invalidates this test'
+    )
     mocker.patch.dict(os.environ, {}, clear=True)
     config = Config.from_args(namespace)
     assert config.topic == 'topic value'

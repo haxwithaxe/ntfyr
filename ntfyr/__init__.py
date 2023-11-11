@@ -3,5 +3,9 @@
 This is just the backend of the ntfyr script.
 """
 
-from .ntfyr import notify
-from .errors import NtfyrConfigException, NtfyrError, NtfyrException
+from .errors import (  # noqa: F401
+    NtfyrConfigException,
+    NtfyrError,
+    NtfyrException,
+)
+from .ntfyr import notify  # noqa: F401

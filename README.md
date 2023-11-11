@@ -39,7 +39,7 @@ The following specify metadata (headers). See https://ntfy.sh/docs/publish/ for 
 
 # Install
 * Install via pip: ```pip install ntfyr```
-* Install manually: 
+* Install manually:
 ```sh
 git clone https://github.com/haxwithaxe/ntfyr.git
 cd ntfyr

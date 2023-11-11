@@ -1,8 +1,8 @@
 """The main `ntfyr` functionality."""
 
 
-from datetime import datetime as dt
 import json
+from datetime import datetime as dt
 
 import requests
 import tzlocal
@@ -73,10 +73,17 @@ def notify(config, message):
             message = _get_timestamp(message_format).format(message=message)
         else:
             message = f'{_get_timestamp(timestamp)} {message}'
-    log.debug('Sending request: method=POST, url=%s, headers=%s, auth.user=%s, '
-              'data=%s', url, headers, user, message)
-    res = requests.post(url=url, headers=headers, data=message.encode('utf-8'),
-                        auth=credentials)
+    log.debug(
+        'Sending request: method=POST, url=%s, headers=%s, auth.user=%s, '
+        'data=%s',  # nofmt
+        url,
+        headers,
+        user,
+        message,
+    )
+    res = requests.post(
+        url=url, headers=headers, data=message.encode('utf-8'), auth=credentials
+    )
     try:
         log.debug('Got response: %s\n%s\n', res, res.json())
     except json.JSONDecodeError:
@@ -84,14 +91,26 @@ def notify(config, message):
             'Failed to decode respones form ntfy. Got: %s',
             res.content.decode(),
         )
-        raise NtfyrError(f'{res.status_code} {res.content.decode()}',
-                         server=server, topic=config.get('topic'),
-                         message=message, headers=headers)
+        raise NtfyrError(
+            f'{res.status_code} {res.content.decode()}',
+            server=server,
+            topic=config.get('topic'),
+            message=message,
+            headers=headers,
+        )
     if not res.ok:
         if res.json():
-            raise NtfyrError('{error} {link}'.format(**res.json()),
-                             server=server, topic=config.get('topic'),
-                             message=message, headers=headers)
-        raise NtfyrError(f'{res.status_code} {res.content.decode()}',
-                         server=server, topic=config.get('topic'),
-                         message=message, headers=headers)
+            raise NtfyrError(
+                '{error} {link}'.format(**res.json()),
+                server=server,
+                topic=config.get('topic'),
+                message=message,
+                headers=headers,
+            )
+        raise NtfyrError(
+            f'{res.status_code} {res.content.decode()}',
+            server=server,
+            topic=config.get('topic'),
+            message=message,
+            headers=headers,
+        )

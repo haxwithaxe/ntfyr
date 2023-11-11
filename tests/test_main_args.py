@@ -1,4 +1,3 @@
-
 import pytest
 
 from ntfyr.__main__ import _parse_args
@@ -7,6 +6,7 @@ from ntfyr.config import DEFAULT_TIMESTAMP
 
 def test_parse_args_all():
     args = [
+        # fmt: off
         '--actions', 'action value',
         '--attach', 'attach value',
         '--click', 'click value',
@@ -23,6 +23,7 @@ def test_parse_args_all():
         '--password', 'password value',
         '--config', 'config value',
         '--log-level', 'DEBUG'
+        # fmt: on
     ]
     parsed = _parse_args(args)
     assert parsed.actions == 'action value'
@@ -45,6 +46,7 @@ def test_parse_args_all():
 
 def test_parse_args_all_short():
     args = [
+        # fmt: off
         '-A', 'action value',
         '-X', 'attach value',
         '-C', 'click value',
@@ -59,6 +61,7 @@ def test_parse_args_all_short():
         '-u', 'user value',
         '-p', 'password value',
         '-c', 'config value'
+        # fmt: on
     ]
     parsed = _parse_args(args)
     assert parsed.actions == 'action value'
@@ -97,5 +100,11 @@ def test_parse_args_invalid_priority():
 
 def test_parse_args_invalid_log_level():
     with pytest.raises(SystemExit):
-        _parse_args(['--topic', 'good topic', '--log-level',
-                     'invalid log level'])
+        _parse_args(
+            [
+                '--topic',
+                'good topic',
+                '--log-level',
+                'invalid log level',
+            ]
+        )

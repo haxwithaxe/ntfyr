@@ -1,3 +1,5 @@
+"""End-to-end tests of ntfyr."""
+
 import base64
 import pathlib
 from datetime import datetime
@@ -11,6 +13,7 @@ from .fixtures.ntfy_server import MockNtfyServer
 
 @pytest.mark.system
 def test_parse_args_all(tmp_path: pathlib.Path, ntfy_server: MockNtfyServer):
+    """An end-to-end test of ntfyr with all options set."""
     config_path = tmp_path.joinpath('ntfyr.ini')
     config_path.write_text('[ntfyr]\nlog_level = ERROR')
     username = 'username'
@@ -18,7 +21,7 @@ def test_parse_args_all(tmp_path: pathlib.Path, ntfy_server: MockNtfyServer):
     date_format = '%Y-%m'
     message_value = 'message value'
     formatted_message = (
-        f'{datetime.now().strftime(date_format)} {message_value}'
+        f'{datetime.now().strftime(date_format)} {message_value}'  # nofmt
     )
     topic_value = 'test-topic'
     args = [

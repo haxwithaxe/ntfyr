@@ -6,17 +6,28 @@ This is just the backend of the ntfyr script.
 
 import argparse
 import configparser
-from dataclasses import dataclass, field
 import os
 import pathlib
+from dataclasses import dataclass, field
 
 from ._common import log
 from .errors import NtfyrConfigException
 
 DEFAULT_SERVER = 'https://ntfy.sh'
 DEFAULT_TIMESTAMP = '%Y-%m-%d %H:%M:%S %Z'
-PRIORITIES = ['max', 'urgent', 'high', 'default', 'low', 'min', '1', '2', '3',
-              '4', '5']
+PRIORITIES = [
+    'max',
+    'urgent',
+    'high',
+    'default',
+    'low',
+    'min',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+]
 
 
 def _config_paths():
@@ -24,13 +35,18 @@ def _config_paths():
     if os.environ.get('NTFYR_CONFIGS'):
         paths.extend(os.environ['NTFYR_CONFIGS'].split(':'))
     else:
-        paths.extend(['/etc/ntfyr/config.ini',
-                      '/usr/local/etc/ntfyr/config.ini'])
+        paths.extend(
+            ['/etc/ntfyr/config.ini', '/usr/local/etc/ntfyr/config.ini'],
+        )
         if os.environ.get('XDG_CONFIG_HOME'):
             paths.append(os.environ['XDG_CONFIG_HOME'])
         elif os.environ.get('HOME'):
-            paths.append(os.path.join(os.environ['HOME'],
-                                      '.config/ntfyr/config.ini'))
+            paths.append(
+                os.path.join(
+                    os.environ['HOME'],
+                    '.config/ntfyr/config.ini',
+                )
+            )
     return [pathlib.Path(p) for p in paths]
 
 
@@ -47,8 +63,12 @@ def _convert_source(source):
         try:
             config_text = source.read_text()
         except OSError as err:
-            log.warning('Failed to read config source %s: %s: %s',
-                        source.absolute(), err.__class__.__name__, err)
+            log.warning(
+                'Failed to read config source %s: %s: %s',
+                source.absolute(),
+                err.__class__.__name__,
+                err,
+            )
             return {}
         confparser = configparser.ConfigParser(defaults={})
         confparser.read_string(config_text)
@@ -73,14 +93,18 @@ class NamespaceAdapter:
         self._namespace = namespace
 
     def get(self, key, default=None):
-        if (hasattr(self._namespace, key) and
-                getattr(self._namespace, key) is not None):
+        if (
+            hasattr(self._namespace, key)
+            and getattr(self._namespace, key) is not None  # nofmt
+        ):
             return getattr(self._namespace, key)
         return default
 
     def __contains__(self, key):
-        return (hasattr(self._namespace, key) and
-                getattr(self._namespace, key) is not None)
+        return (
+            hasattr(self._namespace, key)
+            and getattr(self._namespace, key) is not None  # nofmt
+        )
 
     def __getitem__(self, key):
         if key in self:
@@ -90,7 +114,6 @@ class NamespaceAdapter:
 
 @dataclass
 class Config:
-
     topic: str = None
     actions: str = None
     attach: str = None
@@ -131,7 +154,7 @@ class Config:
                 for tag in value:
                     if not tag and not isinstance(tag, int):
                         raise NtfyrConfigException(
-                            f'Invalid value for `tags`: {value}'
+                            f'Invalid value for `tags`: {value}',
                         )
                     tags.append(tag)
                 self.tags = tags
