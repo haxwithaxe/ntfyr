@@ -1,0 +1,68 @@
+exclude: '^docs/conf.py'
+
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+  - id: trailing-whitespace
+  - id: check-added-large-files
+  - id: check-ast
+  - id: check-json
+  - id: check-merge-conflict
+  - id: check-xml
+  - id: check-yaml
+  - id: debug-statements
+  - id: end-of-file-fixer
+  - id: requirements-txt-fixer
+  - id: mixed-line-ending
+    args: ['--fix=lf']  # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
+
+- repo: https://github.com/pycqa/isort
+  rev: 5.12.0
+  hooks:
+  - id: isort
+
+- repo: https://github.com/psf/black
+  rev: 23.9.1
+  hooks:
+  - id: black
+    language_version: python3
+
+## If like to embrace black styles even in the docs:
+# - repo: https://github.com/asottile/blacken-docs
+#   rev: v1.12.0
+#   hooks:
+#   - id: blacken-docs
+#     additional_dependencies: [black]
+
+- repo: https://github.com/PyCQA/flake8
+  rev: 6.0.0
+  hooks:
+  - id: flake8
+    additional_dependencies: [flake8-bugbear, flake8-simplify]
+
+- repo: local
+  hooks:
+    - id: no_debug_comments
+      name: No Debug Comments
+      language: pygrep
+      entry: '("""|#) ?DEBUG'
+      types:
+        - file
+      fail_fast: false
+    - id: no_fixme_comments
+      name: No FIXME Comments
+      language: pygrep
+      entry: '("""|#) ?FIXME'
+      types:
+        - file
+      exclude: .pre-commit-config.yaml
+      fail_fast: false
+    - id: no_testing_comments
+      name: No Testing Comments
+      language: pygrep
+      entry: '("""|#) ?[A-Z0-9_]*TEST'
+      types:
+        - file
+      exclude: '(^.pre-commit-config.yaml|^tests/docker/run.sh)'
+      fail_fast: false
