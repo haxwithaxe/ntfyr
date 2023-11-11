@@ -2,6 +2,8 @@
 
 
 from datetime import datetime as dt
+import json
+
 import requests
 import tzlocal
 
@@ -75,7 +77,16 @@ def notify(config, message):
               'data=%s', url, headers, user, message)
     res = requests.post(url=url, headers=headers, data=message.encode('utf-8'),
                         auth=credentials)
-    log.debug('Got response: %s\n%s\n', res, res.json())
+    try:
+        log.debug('Got response: %s\n%s\n', res, res.json())
+    except json.JSONDecodeError:
+        log.error(
+            'Failed to decode respones form ntfy. Got: %s',
+            res.content.decode(),
+        )
+        raise NtfyrError(f'{res.status_code} {res.content.decode()}',
+                         server=server, topic=config.get('topic'),
+                         message=message, headers=headers)
     if not res.ok:
         if res.json():
             raise NtfyrError('{error} {link}'.format(**res.json()),
