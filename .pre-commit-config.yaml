@@ -39,7 +39,9 @@ repos:
   rev: 6.1.0
   hooks:
   - id: flake8
-    additional_dependencies: [flake8-bugbear, flake8-simplify]
+    additional_dependencies:
+      - flake8-bugbear
+      - flake8-simplify
 
 - repo: local
   hooks:
