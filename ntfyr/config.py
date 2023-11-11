@@ -151,9 +151,9 @@ class Config:
     @classmethod
     def from_args(cls, args):
         config = cls()
-        if args.config:
-            config.update(args.config)
-        else:
+        for config_filename in args.config:
+            config.update(config_filename)
+        if not args.config:
             config.search()
         config.update(args)
         return config
