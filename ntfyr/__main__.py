@@ -64,10 +64,13 @@ def _parse_args(args):
     parser.add_argument(
         '-c',
         '--config',
-        default=None,
-        help='The configuration file with default values.'
-             ' The values specified as arguments override the'
-             ' values in this file.'
+        nargs='+',
+        default=[],
+        help='One or more configuration files with default values. The values '
+             'in each file are merged onto the file after it (left to right) '
+             'if more than one file is given.'
+             ' The values specified as arguments override the values in this '
+             'file.'
     )
     parser.add_argument(
         '--log-level',
@@ -96,10 +99,10 @@ def _get_message(args):
         return args.message
 
 
-def main():  # noqa: D103
-    args = _parse_args(sys.argv)
-    config = _configure(args)
-    message = _get_message(args)
+def main(args: list[str]):  # noqa: D103
+    parsed_args = _parse_args(args)
+    config = _configure(parsed_args)
+    message = _get_message(parsed_args)
     try:
         notify(config, message)
     except NtfyrError as err:
@@ -113,7 +116,7 @@ def main():  # noqa: D103
 
 if __name__ == '__main__':
     try:
-        main()
+        main(sys.argv[1:])
     except Exception as err:
         print('ERROR:ntfyr:', err.__class__.__name__, err, file=sys.stderr)
         sys.exit(2)
