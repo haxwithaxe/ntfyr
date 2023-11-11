@@ -39,7 +39,7 @@ def test_parse_args_all():
     assert parsed.server == 'server value'
     assert parsed.user == 'user value'
     assert parsed.password == 'password value'
-    assert parsed.config == 'config value'
+    assert parsed.config == ['config value']
     assert parsed.log_level == 'DEBUG'
 
 
@@ -75,7 +75,7 @@ def test_parse_args_all_short():
     assert parsed.server == 'server value'
     assert parsed.user == 'user value'
     assert parsed.password == 'password value'
-    assert parsed.config == 'config value'
+    assert parsed.config == ['config value']
     assert parsed.log_level == 'ERROR'  # Default value
 
 
