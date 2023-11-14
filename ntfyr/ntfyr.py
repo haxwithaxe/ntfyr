@@ -14,6 +14,8 @@ from .errors import NtfyrError
 def _get_headers(config):
     """Get headers from arguments and configs."""
     headers = {}
+    if config.token:
+        headers['Authorization'] = f'Bearer {config.token}'
     if config.actions:
         headers['Actions'] = config.actions
     if config.attach:
@@ -59,10 +61,15 @@ def notify(config, message):
     headers = _get_headers(config)
     user = config.user
     password = config.password
+    if config.user and config.password and config.token:
+        raise NtfyrError(
+            'Either user and password, or token can be specified, but not all '
+            'of them.'  # nofmt
+        )
+    if (user and not password) or (not user and password):
+        raise NtfyrError('Either user or password was specified but not both.')
     if user and password:
         credentials = (user, password)
-    elif (user and not password) or (not user and password):
-        raise NtfyrError('Either user or password was specified but not both.')
     else:
         credentials = None
     if config.include_timestamp:
@@ -94,7 +101,7 @@ def notify(config, message):
         raise NtfyrError(
             f'{res.status_code} {res.content.decode()}',
             server=server,
-            topic=config.get('topic'),
+            topic=config.topic,
             message=message,
             headers=headers,
         )
@@ -103,14 +110,14 @@ def notify(config, message):
             raise NtfyrError(
                 '{error} {link}'.format(**res.json()),
                 server=server,
-                topic=config.get('topic'),
+                topic=config.topic,
                 message=message,
                 headers=headers,
             )
         raise NtfyrError(
             f'{res.status_code} {res.content.decode()}',
             server=server,
-            topic=config.get('topic'),
+            topic=config.topic,
             message=message,
             headers=headers,
         )

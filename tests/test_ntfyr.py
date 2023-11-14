@@ -95,7 +95,7 @@ def test_get_timestamp(mocker):
     _too_close_to_midnight(),
     reason='Too close to midnight. Timestamp might be wrong erroneously.',
 )
-def test_notify_kitchen_sink(mocker):
+def test_notify_kitchen_sink_password(mocker):
     message = 'test message'  # Must not contain time format variables
     context, mock_post = _mock_post_factory()
     mocker.patch('ntfyr.ntfyr.requests.post', mock_post)
@@ -129,6 +129,47 @@ def test_notify_kitchen_sink(mocker):
     assert context['headers']['Title'] == config.title
     # Config
     assert context['auth'] == (config.user, config.password)
+    assert context['url'] == f'{config.server}/{config.topic}'
+    # Message/timestamp
+    assert (
+        context['data']
+        == dt.now().strftime(f'timestamp value: %Y-%m {message}').encode()
+    )
+
+
+def test_notify_kitchen_sink_token(mocker):
+    message = 'test message'  # Must not contain time format variables
+    context, mock_post = _mock_post_factory()
+    mocker.patch('ntfyr.ntfyr.requests.post', mock_post)
+    config = Config(
+        topic='topic value',
+        # Headers
+        actions='actions value',
+        attach='attach value',
+        click='click value',
+        delay='delay value',
+        email='email value',
+        priority='priority value',
+        tags=['tag0', 'tag1', 'tag2'],
+        title='title value',
+        # Config
+        include_timestamp=True,
+        timestamp='timestamp value: %Y-%m',
+        server='server value',
+        token='token value',
+    )
+    notify(config, message)
+    # Headers
+    assert context['headers']['Authorization'] == f'Bearer {config.token}'
+    assert context['headers']['Actions'] == config.actions
+    assert context['headers']['Attach'] == config.attach
+    assert context['headers']['Click'] == config.click
+    assert context['headers']['Delay'] == config.delay
+    assert context['headers']['Email'] == config.email
+    assert context['headers']['Priority'] == config.priority
+    assert context['headers']['Tags'] == ','.join(config.tags)
+    assert context['headers']['Title'] == config.title
+    # Config
     assert context['url'] == f'{config.server}/{config.topic}'
     # Message/timestamp
     assert (

@@ -114,6 +114,12 @@ def _parse_args(args):
         help='The password to authenticate to the server with.',
     )
     parser.add_argument(
+        '-o',
+        '--token',
+        default=None,
+        help='The token to authenticate to the server with.',
+    )
+    parser.add_argument(
         '-c',
         '--config',
         nargs='+',

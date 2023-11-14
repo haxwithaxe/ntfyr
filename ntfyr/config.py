@@ -128,6 +128,7 @@ class Config:
     server: str = DEFAULT_SERVER
     user: str = None
     password: str = None
+    token: str = None
 
     def get(self, key, default=None):
         if key in self.__dict__:
