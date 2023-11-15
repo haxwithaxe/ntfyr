@@ -157,7 +157,7 @@ def _get_message(args):
         return args.message
 
 
-def main(args: list[str]):  # noqa: D103
+def main(args: list[str] = None):  # noqa: D103
     parsed_args = _parse_args(args)
     config = _configure(parsed_args)
     message = _get_message(parsed_args)
@@ -176,7 +176,7 @@ def main(args: list[str]):  # noqa: D103
 
 if __name__ == '__main__':
     try:
-        main(sys.argv[1:])
+        main()
     except Exception as err:
         print('ERROR:ntfyr:', err.__class__.__name__, err, file=sys.stderr)
         sys.exit(2)
