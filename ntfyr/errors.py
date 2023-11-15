@@ -8,8 +8,6 @@ class NtfyrException(Exception):
 class NtfyrConfigException(NtfyrException):
     """Indicates an error in a `ntfyr` config file."""
 
-    pass
-
 
 class NtfyrError(NtfyrException):
     """An exception that indicates a fatal error.

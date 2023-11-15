@@ -165,9 +165,8 @@ def main(args: list[str] = None):  # noqa: D103
         notify(config, message)
     except NtfyrError as err:
         log.error(
-            'Error sending to {err.server}/{err.topic}: '
-            '{err.__class__.__name__}: {err.message}',
-            err=err,
+            f'Error sending to {err.server}/{err.topic}: '
+            f'{err.__class__.__name__}: {err.message}',
         )
         log.debug('Sent headers: %s', err.headers)
         log.debug('Sent message:\n%s', message)
