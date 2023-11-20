@@ -127,8 +127,8 @@ def _parse_args(args):
         help='One or more configuration files with default values. The values '
         'in each file are merged onto the file after it (left to right) '
         'if more than one file is given.'
-        ' The values specified as arguments override the values in this '
-        'file.',
+        ' The values specified as arguments override the values in these '
+        'files.',
     )
     parser.add_argument(
         '--log-level',
