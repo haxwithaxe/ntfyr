@@ -108,7 +108,10 @@ def notify(config, message):
     if not res.ok:
         if res.json():
             raise NtfyrError(
-                '{error} {link}'.format(**res.json()),
+                '{error} {link}'.format(
+                    error=res.json().get('error'),
+                    link=res.json().get('link', ''),
+                ),
                 server=server,
                 topic=config.topic,
                 message=message,
