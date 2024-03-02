@@ -39,7 +39,12 @@ def _config_paths():
             ['/etc/ntfyr/config.ini', '/usr/local/etc/ntfyr/config.ini'],
         )
         if os.environ.get('XDG_CONFIG_HOME'):
-            paths.append(os.environ['XDG_CONFIG_HOME'])
+            paths.append(
+                os.path.join(
+                    os.environ['XDG_CONFIG_HOME'],
+                    'ntfyr/config.ini',
+                )
+            )
         elif os.environ.get('HOME'):
             paths.append(
                 os.path.join(

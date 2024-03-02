@@ -34,7 +34,7 @@ def test_config_paths_env_xdg_home_config(mocker):
     expected_paths = [
         pathlib.Path('/etc/ntfyr/config.ini'),
         pathlib.Path('/usr/local/etc/ntfyr/config.ini'),
-        pathlib.Path(home_dir),
+        pathlib.Path(home_dir).joinpath('ntfyr/config.ini'),
     ]
     mocker.patch.dict(
         os.environ,
