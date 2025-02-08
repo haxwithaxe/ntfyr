@@ -56,7 +56,11 @@ def notify(config, message):
         config (dict): Parsed config from the config file.
         message (str): The body of the message to be sent.
     """
+    if not config.server:
+        raise NtfyrError('A server must be specified.')
     server = config.server
+    if not config.topic:
+        raise NtfyrError('A topic must be specified.')
     url = f'{server}/{config.topic}'
     headers = _get_headers(config)
     user = config.user

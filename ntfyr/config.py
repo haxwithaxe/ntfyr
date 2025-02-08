@@ -167,7 +167,7 @@ class Config:
                 continue
             if key == 'timestamp' and source.get('timestamp'):
                 self.include_timestamp = True
-            self._typed_set(key, source.get(key), required_type)
+            self._typed_set(key, source.get(key, self.get(key)), required_type)
         return self
 
     def _typed_set(self, attr, value, required_type, choices=None):
