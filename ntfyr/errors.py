@@ -24,7 +24,7 @@ class NtfyrError(NtfyrException):
             in the config.
     """
 
-    def __init__(
+    def __init__(  # noqa: B042
         self,
         error,
         server=None,

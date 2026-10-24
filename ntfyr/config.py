@@ -3,7 +3,6 @@
 This is just the backend of the ntfyr script.
 """
 
-
 import argparse
 import configparser
 import os

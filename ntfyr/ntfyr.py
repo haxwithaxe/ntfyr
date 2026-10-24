@@ -1,6 +1,5 @@
 """The main `ntfyr` functionality."""
 
-
 import json
 from datetime import datetime as dt
 

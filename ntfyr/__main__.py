@@ -4,7 +4,6 @@ This script is a part of the python package ntfyr which can be found at
 https://github.com/haxwithaxe/ntfyr and https://pypi.org/project/ntfyr/
 """
 
-
 import argparse
 import logging
 import select
